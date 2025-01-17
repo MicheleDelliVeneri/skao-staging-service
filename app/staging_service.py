@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel, Field, ConfigDict
 import os
 from typing import List, Literal
-from staging_methods import AVAILABLE_METHODS
+from app.staging_methods import AVAILABLE_METHODS
 import json
 # FastAPI application
 app = FastAPI(title="Data Staging Service")
