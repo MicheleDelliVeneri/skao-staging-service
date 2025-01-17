@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "skao-staging-service.fullname" . }}
+  labels:
+    app: {{ include "skao-staging-service.name" . }}
+    chart: {{ include "skao-staging-service.chart" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "skao-staging-service.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "skao-staging-service.name" . }}
+    spec:
+      containers:
+        - name: {{ include "skao-staging-service.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+            - name: BASE_USER_AREA_PATH
+              value: "{{ .Values.config.baseUserAreaPath }}"
+            - name: ALLOWED_METHODS
+              value: '{{ .Values.config.allowedMethods | toJson }}'
