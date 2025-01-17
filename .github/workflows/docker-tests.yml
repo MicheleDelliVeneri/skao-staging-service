@@ -1,0 +1,42 @@
+name: Docker Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  docker-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Lint the Dockerfile using hadolint
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v2
+        with:
+          dockerfile: Dockerfile
+
+      # Step 3: Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t skao-staging-service .
+
+      # Step 4: Run unit tests inside the container
+      - name: Run tests inside Docker container
+        run: |
+          docker run --rm skao-staging-service pytest --cov=app --cov-report=xml
+
+      # Step 5: Verify the application runs correctly
+      - name: Test application health
+        run: |
+          docker run --rm -d -p 8000:8000 --name skao-service skao-staging-service
+          sleep 5  # Allow time for the service to start
+          curl -f http://127.0.0.1:8000/docs || exit 1
+          docker stop skao-service

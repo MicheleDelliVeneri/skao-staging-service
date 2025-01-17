@@ -1,0 +1,38 @@
+name: Helm Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  helm-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Install Helm
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      # Install helm-unittest plugin
+      - name: Install helm-unittest Plugin
+        run: |
+          helm plugin install https://github.com/quintush/helm-unittest
+
+      # Run Helm Lint
+      - name: Lint Helm Chart
+        run: |
+          helm lint ./charts/skao-staging-service
+
+      # Run Helm Unit Tests
+      - name: Run Helm Unit Tests
+        run: |
+          helm unittest ./charts/skao-staging-service

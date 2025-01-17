@@ -1,0 +1,37 @@
+name: Helm Integration Tests with Kind
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Set up Kind Cluster
+      - name: Set up Kind
+        uses: helm/kind-action@v1.4.0
+
+      # Install Helm
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      # Deploy Helm Chart
+      - name: Deploy Chart
+        run: |
+          helm upgrade --install skao-staging-service ./charts/skao-staging-service --values ./charts/skao-staging-service/test-values.yaml
+
+      # Test Deployment
+      - name: Verify Pods
+        run: |
+          kubectl get pods
