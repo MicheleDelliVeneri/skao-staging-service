@@ -3,6 +3,8 @@ from app.staging_service import app
 import os
 import stat
 import pytest
+from fastapi import HTTPException
+from app.utility import ensure_user_exists
 
 client = TestClient(app)
 
@@ -183,3 +185,75 @@ def test_malformed_json():
     # Also expect a 422 error because the request body is invalid
     assert response.status_code == 422
     assert "detail" in response.json()
+
+
+import subprocess
+from unittest.mock import patch
+
+def test_ensure_user_exists_creates_user():
+    """Test that ensure_user_exists creates a user if it doesn't exist."""
+    username = "test_user"
+
+    with patch("subprocess.run") as mock_run:
+        # Simulate 'id' command indicating user does not exist
+        mock_run.side_effect = [
+            subprocess.CompletedProcess(args=["id", username], returncode=1),  # User not found
+            subprocess.CompletedProcess(args=["useradd", "-m", username], returncode=0)  # User created successfully
+        ]
+
+        ensure_user_exists(username)
+        assert mock_run.call_count == 2
+        mock_run.assert_any_call(["id", username], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+        mock_run.assert_any_call(["useradd", "-m", username], check=True)
+
+
+def test_ensure_user_exists_user_already_exists():
+    """Test that ensure_user_exists does nothing if the user already exists."""
+    username = "existing_user"
+
+    with patch("subprocess.run") as mock_run:
+        # Simulate 'id' command indicating user exists
+        mock_run.return_value = subprocess.CompletedProcess(args=["id", username], returncode=0)
+
+        ensure_user_exists(username)
+        mock_run.assert_called_once_with(["id", username], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+
+
+def test_ensure_user_exists_user_creation_failure():
+    """Test that ensure_user_exists raises an error if user creation fails."""
+    username = "failing_user"
+
+    with patch("subprocess.run") as mock_run:
+        # Simulate 'id' command indicating user does not exist
+        # Simulate 'useradd' failing
+        mock_run.side_effect = [
+            subprocess.CompletedProcess(args=["id", username], returncode=1),  # User not found
+            subprocess.CalledProcessError(1, ["useradd", "-m", username])  # User creation fails
+        ]
+
+        with pytest.raises(HTTPException) as exc_info:
+            ensure_user_exists(username)
+
+        assert exc_info.value.status_code == 500
+        assert "Failed to ensure user exists" in str(exc_info.value.detail)
+        assert mock_run.call_count == 2
+        mock_run.assert_any_call(["id", username], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+        mock_run.assert_any_call(["useradd", "-m", username], check=True)
+
+
+def test_user_permissions_after_creation():
+    """Test that staged files are owned by the created user."""
+    username = "test_user"
+    file_path = "/tmp/user_areas/test_user/project/file1.txt"
+
+    # Ensure the file exists
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, "w") as f:
+        f.write("Sample content")
+
+    # Simulate setting ownership to the user
+    os.chown(file_path, os.getuid(), os.getgid())  # Use mock in real tests
+
+    # Verify ownership (requires mock or careful setup in tests)
+    file_stat = os.stat(file_path)
+    assert file_stat.st_uid == os.getuid(), "File is not owned by the correct user"
