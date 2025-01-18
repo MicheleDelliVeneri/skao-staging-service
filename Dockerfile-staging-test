@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app
 
-ENTRYPOINT ["pytest", "--cov=app", "--cov-report=xml:/app/coverage_output/coverage.xml", "tests"]
+ENTRYPOINT ["pytest", "--cov=app", "--cov-report=xml:/app/coverage_output/coverage.xml", "--junitxml=/app/coverage_output/junit.xml", "-o", "junit_family=legacy", "tests"]

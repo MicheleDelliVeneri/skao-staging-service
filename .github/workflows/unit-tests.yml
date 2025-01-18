@@ -44,3 +44,12 @@ jobs:
           files: ./coverage_output/coverage.xml
           flags: unittests
           fail_ci_if_error: true
+
+      # Step 6: Upload test results to Codecov
+      - name: Upload Test Results to Codecov
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage_output/junit.xml
+          flags: testresults
+          fail_ci_if_error: true
