@@ -1,4 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query, Depends
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field, ConfigDict
 import os
 from typing import List, Optional
@@ -219,3 +221,20 @@ async def stage_data(
             return {"status": "success", "message": f"Data already available at {target_path}"}
 
 
+@app.get("/logs/", response_class=PlainTextResponse)
+async def get_logs():
+    """Expose application logs."""
+    log_file_path = "staging_service.log"  # Adjust path if necessary
+    if not os.path.exists(log_file_path):
+        raise HTTPException(status_code=404, detail="Log file not found")
+
+    try:
+        with open(log_file_path, "r") as log_file:
+            return log_file.read()
+    except Exception as e:
+        logger.error(f"Error reading log file: {e}")
+        raise HTTPException(status_code=500, detail="Could not read log file")
+
+# ----------------------- FRONTEND ------------------------------------------------------
+
+app.mount("/", StaticFiles(directory="frontend/build", html=True), name="frontend")

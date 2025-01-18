@@ -75,6 +75,7 @@ spec:
             - name: user-area-ceph-storage
               mountPath: "{{ .Values.storage.userArea.ceph.path }}"
             {{- end }}
+
       volumes:
         {{- if and .Values.storage.source.local.enabled (eq .Values.storage.source.type "local") }}
         - name: source-local-storage
