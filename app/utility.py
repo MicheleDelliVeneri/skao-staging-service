@@ -47,9 +47,12 @@ def set_read_only(path, username):
         raise HTTPException(status_code=400, detail=f"User {username} does not exist.")
 
 def ensure_user_exists(username: str):
-    """Ensure the user exists on the system. Create if it does not."""
+    """Ensure the user exists on the system. Skip creation in test environments."""
+    if os.getenv("TEST_ENV", "false") == "true":
+        logger.debug(f"Skipping user creation for testing: {username}")
+        return
+
     try:
-        # Check if the user exists
         result = subprocess.run(
             ["id", username],
             stdout=subprocess.PIPE,
@@ -58,11 +61,7 @@ def ensure_user_exists(username: str):
         )
         if result.returncode != 0:
             logger.info(f"User {username} does not exist. Creating user.")
-            # Create the user
-            subprocess.run(
-                ["useradd", "-m", username],
-                check=True
-            )
+            subprocess.run(["useradd", "-m", username], check=True)
             logger.info(f"User {username} created successfully.")
         else:
             logger.debug(f"User {username} already exists.")

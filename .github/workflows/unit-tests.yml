@@ -31,6 +31,8 @@ jobs:
 
       # Step 4: Run unit tests with coverage
       - name: Run Unit Tests
+        env:
+          TEST_ENV: true
         run: |
           pytest --cov=app --cov-report=xml tests
 
