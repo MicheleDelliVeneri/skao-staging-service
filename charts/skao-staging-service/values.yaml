@@ -11,10 +11,12 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
+# Port for the service, can be changed to LoadBalancer
 service:
   type: NodePort
   port: 8000
 
+# Set up for DNS and Proxy
 ingress:
   enabled: false
   annotations: {}
@@ -25,8 +27,50 @@ ingress:
           pathType: ImplementationSpecific
   tls: []
 
+# Logging level, logs are accessible with kubectl logs skao-staging-service-pod
+logging:
+  level: "DEBUG"  # Logging level for the application
+
+# local storage, more storages to be implemented. For now a single storage, when app accepts target destination multiple
+# storages could be mounted
+storage:
+  source:
+    type: 'local'
+    local:
+      enabled: true
+      path: "/mnt/storage_a"  # Mount source storage to this path inside the container
+      hostPath: "/Volumes/FastStorage/storage_a"  # Path on the host machine
+    nfs:
+      enabled: false
+      path: "/mnt/source-nfs"
+      server: "nfs-source.example.com"
+      serverPath: "/source-nfs-exported-path"
+    ceph:
+      enabled: false
+      path: "/mnt/source-ceph"
+      server: "ceph-source.example.com"
+      options: "name=admin,secret=<secret>,rw"
+
+  userArea:
+    type: 'local'
+    local:
+      enabled: true
+      path: "/mnt/user_areas"  # Mount user area to this path inside the container
+      hostPath: "/Volumes/FastStorage/storage_a"  # Path on the host machine
+    nfs:
+      enabled: false
+      path: "/mnt/user-area-nfs"
+      server: "nfs-user-area.example.com"
+      serverPath: "/user-area-nfs-exported-path"
+    ceph:
+      enabled: false
+      path: "/mnt/user-area-ceph"
+      server: "ceph-user-area.example.com"
+      options: "name=admin,secret=<secret>,rw"
+
 config:
-  baseUserAreaPath: "/tmp/user_areas/"
+  rucioBaseUrl: "https://rucio-instance"
+  jupyterHubUrl: "https://jupyterhub"
   allowedMethods:
-    - method_1
-    - method_2
+    - local_copy
+    - local_symlink

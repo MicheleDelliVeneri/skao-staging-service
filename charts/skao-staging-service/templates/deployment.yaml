@@ -22,7 +22,99 @@ spec:
           ports:
             - containerPort: {{ .Values.service.port }}
           env:
-            - name: BASE_USER_AREA_PATH
-              value: "{{ .Values.config.baseUserAreaPath }}"
             - name: ALLOWED_METHODS
               value: '{{ .Values.config.allowedMethods | toJson }}'
+            - name: RUCIO_BASE_URL
+              value: "{{ .Values.config.rucioBaseUrl }}"
+            - name: JUPYTERHUB_URL
+              value: "{{ .Values.config.jupyterHubUrl }}"
+            - name: LOGGING_LEVEL
+              value: "{{ .Values.logging.level }}"
+            - name: SOURCE_STORAGE_PATH
+              value: '{{- if eq .Values.storage.source.type "local" -}}
+                {{ .Values.storage.source.local.path }}
+                {{- else if eq .Values.storage.source.type "nfs" -}}
+                {{ .Values.storage.source.nfs.path }}
+                {{- else if eq .Values.storage.source.type "ceph" -}}
+                {{ .Values.storage.source.ceph.path }}
+                {{- else -}}
+                /mnt/source-default
+                {{- end }}'
+            - name: TARGET_STORAGE_PATH
+              value: '{{- if eq .Values.storage.userArea.type "local" -}}
+                {{ .Values.storage.userArea.local.path }}
+                {{- else if eq .Values.storage.userArea.type "nfs" -}}
+                {{ .Values.storage.userArea.nfs.path }}
+                {{- else if eq .Values.storage.userArea.type "ceph" -}}
+                {{ .Values.storage.userArea.ceph.path }}
+                {{- else -}}
+                /mnt/user-area-default
+                {{- end }}'
+          volumeMounts:
+            {{- if and .Values.storage.source.local.enabled (eq .Values.storage.source.type "local") }}
+            - name: source-local-storage
+              mountPath: "{{ .Values.storage.source.local.path }}"
+            {{- end }}
+            {{- if and .Values.storage.source.nfs.enabled (eq .Values.storage.source.type "nfs") }}
+            - name: source-nfs-storage
+              mountPath: "{{ .Values.storage.source.nfs.path }}"
+            {{- end }}
+            {{- if and .Values.storage.source.ceph.enabled (eq .Values.storage.source.type "ceph") }}
+            - name: source-ceph-storage
+              mountPath: "{{ .Values.storage.source.ceph.path }}"
+            {{- end }}
+            {{- if and .Values.storage.userArea.local.enabled (eq .Values.storage.userArea.type "local") }}
+            - name: user-area-local-storage
+              mountPath: "{{ .Values.storage.userArea.local.path }}"
+            {{- end }}
+            {{- if and .Values.storage.userArea.nfs.enabled (eq .Values.storage.userArea.type "nfs") }}
+            - name: user-area-nfs-storage
+              mountPath: "{{ .Values.storage.userArea.nfs.path }}"
+            {{- end }}
+            {{- if and .Values.storage.userArea.ceph.enabled (eq .Values.storage.userArea.type "ceph") }}
+            - name: user-area-ceph-storage
+              mountPath: "{{ .Values.storage.userArea.ceph.path }}"
+            {{- end }}
+      volumes:
+        {{- if and .Values.storage.source.local.enabled (eq .Values.storage.source.type "local") }}
+        - name: source-local-storage
+          hostPath:
+            path: "{{ .Values.storage.source.local.hostPath }}"
+            type: DirectoryOrCreate
+        {{- end }}
+        {{- if and .Values.storage.source.nfs.enabled (eq .Values.storage.source.type "nfs") }}
+        - name: source-nfs-storage
+          nfs:
+            server: "{{ .Values.storage.source.nfs.server }}"
+            path: "{{ .Values.storage.source.nfs.serverPath }}"
+        {{- end }}
+        {{- if and .Values.storage.source.ceph.enabled (eq .Values.storage.source.type "ceph") }}
+        - name: source-ceph-storage
+          flexVolume:
+            driver: ceph.rook.io/rook
+            options:
+              path: "{{ .Values.storage.source.ceph.path }}"
+              server: "{{ .Values.storage.source.ceph.server }}"
+              {{ .Values.storage.source.ceph.options | nindent 8 }}
+        {{- end }}
+        {{- if and .Values.storage.userArea.local.enabled (eq .Values.storage.userArea.type "local") }}
+        - name: user-area-local-storage
+          hostPath:
+            path: "{{ .Values.storage.userArea.local.hostPath }}"
+            type: DirectoryOrCreate
+        {{- end }}
+        {{- if and .Values.storage.userArea.nfs.enabled (eq .Values.storage.userArea.type "nfs") }}
+        - name: user-area-nfs-storage
+          nfs:
+            server: "{{ .Values.storage.userArea.nfs.server }}"
+            path: "{{ .Values.storage.userArea.nfs.serverPath }}"
+        {{- end }}
+        {{- if and .Values.storage.userArea.ceph.enabled (eq .Values.storage.userArea.type "ceph") }}
+        - name: user-area-ceph-storage
+          flexVolume:
+            driver: ceph.rook.io/rook
+            options:
+              path: "{{ .Values.storage.userArea.ceph.path }}"
+              server: "{{ .Values.storage.userArea.ceph.server }}"
+              {{ .Values.storage.userArea.ceph.options | nindent 8 }}
+        {{- end }}
