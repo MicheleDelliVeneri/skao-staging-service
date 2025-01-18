@@ -2,12 +2,18 @@
 
 [![Qodana](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/qodana_code_quality.yml/badge.svg)](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/qodana_code_quality.yml)
 [![codecov](https://codecov.io/gh/MicheleDelliVeneri/skao-staging-service/branch/main/graph/badge.svg?token=8MHP9PACXY)](https://codecov.io/gh/MicheleDelliVeneri/skao-staging-service)
+[![Documentation Status](https://readthedocs.org/projects/skao-staging-service/badge/?version=latest)](https://skao-staging-service.readthedocs.io/en/latest/?badge=latest)
 A FastAPI service that stages data for SKAO analysis. This repository includes:
 
 - **FastAPI** code in [`app/staging_service.py`](app/staging_service.py)
 - **Tests** in [`tests/test_staging_service.py`](tests/test_staging_service.py)
 - **Docker** configuration in [`Dockerfile`](Dockerfile)
 - **Helm** chart in [`charts/my-staging-service/`](charts/my-staging-service/)
+- **React** frontend in [`frontend/`](frontend/)
+- **Sphinx** docs in  [`docs/`](docs/)
+
+For a complete description of the service, and its use check our documentation on
+[Read The Docs](https://skao-staging-service.readthedocs.io/en/latest/).
 
 ## Build the service 
 1. Clone the repo: `git clone https://github.com/MicheleDelliVeneri/skao-staging-service.git`
@@ -18,10 +24,10 @@ A FastAPI service that stages data for SKAO analysis. This repository includes:
 5. (Minikube) Create Tunnel: `minikube service skao-staging-service --url`
 6. if you are using minikube, before 1 -5,  switch to minikube docker env with `eval $(minikube docker-env)
 `
-## Test The Service
+## Test The Service with FastAPI Tests
 1. Create two local directories on the Host Machine, one for simulating the local storage, and another to simulate the target user area. These will be mounted in the application pod.
 2. Set the paths of the two directories in the Helm Values.yaml file, one as the `storage.source.local.hostPath` and the other as the `userArea.source.local.hostPath`
-3. Create a file inside the app pod `kubectl exec -it skao-staging-service-7fd6664978-8fml5  -- sh -c "echo 'This is File1.txt' > /mnt/storage_a/File1.txt".` 
+3. Create a file inside the app pod `kubectl exec -it skao-staging-service-7fd6664978-8fml5  -- sh -c "echo 'This is File1.txt' > /mnt/storage_a/File1.txt".` or use the frontend tool 
 This file simulates the file that the user want to stage from the local storage to its user area. 
 4. Navigate to `http:127.0.0.1:MINIKUBEPORT/docs` where MINIKUBEPORT is the port obtained in step 5. 
 5. Set method to `local_copy`, set your `username` and add the following request body:
@@ -40,6 +46,10 @@ You should see a Succesfull response
   "message": "Data staged for user michele with method local_copy"
 }
 ```
+## Test The Service with Frontend
+1. Navigate to the url provided by `minikube service skao-staging-service --url`
+2. Create a File with the FileCreation Tool 
+3. Use your favorite staging method to move the created file
 # Helm Chart Guide
 
 ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
