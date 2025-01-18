@@ -1,8 +1,24 @@
 import os
-import os
 import pwd
 import grp
 from fastapi import HTTPException
+import subprocess
+import logging
+
+LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO").upper()
+# Set up logging
+logging.basicConfig(
+    level=getattr(logging, LOGGING_LEVEL, logging.INFO),  # Set logging level to DEBUG for detailed logs
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler(), # Log to console
+        logging.FileHandler("staging_service.log")
+    ]
+)
+logger = logging.getLogger(__name__)
+
+
+
 
 def set_read_only(path, username):
     """Set read-only permissions and ownership for a specific user."""
@@ -29,3 +45,30 @@ def set_read_only(path, username):
             os.chown(path, uid, gid)  # Change ownership to the root directory
     except KeyError:
         raise HTTPException(status_code=400, detail=f"User {username} does not exist.")
+
+def ensure_user_exists(username: str):
+    """Ensure the user exists on the system. Create if it does not."""
+    try:
+        # Check if the user exists
+        result = subprocess.run(
+            ["id", username],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if result.returncode != 0:
+            logger.info(f"User {username} does not exist. Creating user.")
+            # Create the user
+            subprocess.run(
+                ["useradd", "-m", username],
+                check=True
+            )
+            logger.info(f"User {username} created successfully.")
+        else:
+            logger.debug(f"User {username} already exists.")
+    except Exception as e:
+        logger.exception(f"Failed to ensure user exists: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to ensure user exists: {str(e)}"
+        )

@@ -4,7 +4,7 @@ import os
 from typing import List
 import json
 from app.staging_methods import AVAILABLE_METHODS
-from app.utility import set_read_only
+from app.utility import set_read_only, ensure_user_exists
 import logging
 # FastAPI application
 app = FastAPI(title="SKAO Data Staging Service")
@@ -145,6 +145,9 @@ async def stage_data(
         logger.warning(f"Invalid method: {method}")
         raise HTTPException(status_code=400, detail=f"Invalid staging method: {method}")
 
+    # Ensure the user exists
+    ensure_user_exists(username)
+
     # Load Source and Target storage
     source_storage = site_config['source_storage_path']
     target_storage = site_config['target_storage_path']
@@ -165,19 +168,23 @@ async def stage_data(
     # Ensure the target directory exists
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
     # Apply the chosen method
-    try:
-        AVAILABLE_METHODS[method](local_path, target_path)
-        logger.debug(f"Applied method {method} on {local_path}")
-        # Set read-only
-        set_read_only(target_path, username)
-        logger.debug(f"Set read-only permissions for {target_path}")
+    if not os.path.exists(target_path):
+        try:
+            AVAILABLE_METHODS[method](local_path, target_path)
+            logger.debug(f"Applied method {method} on {local_path}")
+            # Set read-only
+            set_read_only(target_path, username)
+            logger.debug(f"Set read-only permissions for {target_path}")
 
-    except HTTPException as e:
-        logger.error(f"HTTPException: {e.detail}")
-        raise e
-    except Exception as e:
-        logger.exception(f"Unexpected error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        except HTTPException as e:
+            logger.error(f"HTTPException: {e.detail}")
+            raise e
+        except Exception as e:
+            logger.exception(f"Unexpected error: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
-    logger.info(f"Data staged successfully for user {username} with method {method}")
-    return {"status": "success", "message": f"Data staged for user {username} with method {method}"}
+        logger.info(f"Data staged successfully for user {username} with method {method}")
+        return {"status": "success", "message": f"Data staged for user {username} with method {method}"}
+    else:
+        logger.info(f"Data is already available at {target_path}")
+        return {"status": "success", "message": f"Data already available at {target_path}"}

@@ -56,7 +56,7 @@ storage:
     local:
       enabled: true
       path: "/mnt/user_areas"  # Mount user area to this path inside the container
-      hostPath: "/Volumes/FastStorage/storage_a"  # Path on the host machine
+      hostPath: "/Volumes/FastStorage/user_areas"  # Path on the host machine
     nfs:
       enabled: false
       path: "/mnt/user-area-nfs"
