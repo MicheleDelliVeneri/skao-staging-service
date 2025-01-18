@@ -5,13 +5,12 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
-project = 'skao-staging-service'
-copyright = '2025, Michele Delli Veneri'
-author = 'Michele Delli Veneri'
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../../'))
+sys.path.insert(0, os.path.abspath('../../'))
+project = 'skao-staging-service'
+author = 'Michele Delli Veneri'
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 

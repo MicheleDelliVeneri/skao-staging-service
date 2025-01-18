@@ -354,5 +354,7 @@ async def create_file(
         raise HTTPException(status_code=500, detail=f"Failed to create file: {e}")
 
 # ----------------------- FRONTEND ------------------------------------------------------
-
-app.mount("/", StaticFiles(directory="frontend/build", html=True), name="frontend")
+if os.path.exists("frontend/build"):
+    app.mount("/", StaticFiles(directory="frontend/build", html=True), name="frontend")
+else:
+    logger.error(f'Frontend has not been built')
