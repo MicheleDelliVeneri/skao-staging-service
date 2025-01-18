@@ -21,7 +21,16 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def event_stream(session, url):
-    """Generator yielding events from a JSON event stream."""
+    """
+    Generator yielding events from a JSON event stream.
+
+    Args:
+        session: Session object for making requests.
+        url (str): URL of the event stream.
+
+    Yields:
+        dict: Event data.
+    """
     r = session.get(url, stream=True)
     r.raise_for_status()
     for line in r.iter_lines():
@@ -31,7 +40,18 @@ def event_stream(session, url):
 
 
 def get_user_status(user_name):
-    """Get detailed user status."""
+    """
+    Get detailed user status.
+
+    Args:
+        user_name (str): Name of the user.
+
+    Returns:
+        dict: User status data.
+
+    Raises:
+        HTTPException: If the request to fetch user status fails.
+    """
     try:
         url = f"{JUPYTERHUB_URL}/hub/api/users/{user_name}"
         response = requests.get(url, headers=HEADERS)
@@ -43,7 +63,19 @@ def get_user_status(user_name):
 
 
 def start_user_server(user_name, server_name=""):
-    """Start a JupyterHub server and wait for it to be ready."""
+    """
+    Start a JupyterHub server and wait for it to be ready.
+
+    Args:
+        user_name (str): Name of the user.
+        server_name (str, optional): Name of the server. Defaults to "".
+
+    Returns:
+        dict: Server data.
+
+    Raises:
+        HTTPException: If the request to start the server fails.
+    """
     user_url = f"{JUPYTERHUB_URL}/users/{user_name}"
     session = requests.Session()
 
@@ -68,7 +100,19 @@ def start_user_server(user_name, server_name=""):
 
 
 def stop_user_server(user_name, server_name=""):
-    """Stop a server and wait for it to complete."""
+    """
+    Stop a server and wait for it to complete.
+
+    Args:
+        user_name (str): Name of the user.
+        server_name (str, optional): Name of the server. Defaults to "".
+
+    Returns:
+        dict: Server data.
+
+    Raises:
+        HTTPException: If the request to stop the server fails.
+    """
     user_url = f"{JUPYTERHUB_URL}/users/{user_name}"
     server_url = f"{user_url}/servers/{server_name}"
     session = requests.Session()

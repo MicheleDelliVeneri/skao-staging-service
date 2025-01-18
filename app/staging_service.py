@@ -25,6 +25,13 @@ logger = logging.getLogger(__name__)
 
 # --------------------------- REQUEST AND RESPONSE MODELS --------------------------------------------
 class DataItem(BaseModel):
+    """
+    DataItem represents a single data mapping with local and relative paths.
+
+    Attributes:
+        local_path_on_storage (str): Local path on storage where the file currently resides.
+        relative_path (str): Relative path inside the user area where the file should be made available.
+    """
     local_path_on_storage: str = Field(
         ...,
         description="Local path on storage where the file currently resides."
@@ -35,8 +42,18 @@ class DataItem(BaseModel):
     )
 
 class StagingRequest(BaseModel):
-    """Request model for staging data."""
+     """
+    StagingRequest represents a request to stage data with a single data mapping.
 
+    Attributes:
+        data (DataItem): Single data mapping with local and relative paths.
+
+    Example:
+        {
+            "local_path_on_storage": "/mnt/storage_a/data1",
+            "relative_path": "project/data1"
+        }
+    """
     data: DataItem = Field(
         ...,
         description="Single data mapping with local and relative paths.",
@@ -49,7 +66,19 @@ class StagingRequest(BaseModel):
     )
 
 class SuccessResponse(BaseModel):
-    """Successful response model."""
+    """
+    Successful response model.
+
+    Attributes:
+        status (str): Status of the response.
+        message (str): Message describing the response.
+
+    Example:
+        {
+            "status": "success",
+            "message": "Data staged for user test_user with method local_copy"
+        }
+    """
     status: str
     message: str
 
@@ -63,7 +92,17 @@ class SuccessResponse(BaseModel):
     )
 
 class ValidationError(BaseModel):
-    """Validation error model."""
+     """
+    Validation error model.
+
+    Attributes:
+        detail (str): Detailed error message.
+
+    Example:
+        {
+            "detail": "Invalid request"
+        }
+    """
     detail: str
 
     model_config = ConfigDict(
@@ -76,7 +115,12 @@ class ValidationError(BaseModel):
 
 # --------------------------- CONFIGURATION --------------------------------------------
 def get_config():
-    """Fetch the application configuration."""
+    """
+    Fetch the application configuration.
+
+    Returns:
+        dict: Application configuration.
+    """
     return {
         "source_storage_path": os.getenv("SOURCE_STORAGE_PATH", "/tmp/storage_a"),
         "target_storage_path": os.getenv("TARGET_STORAGE_PATH", "/tmp/user_areas"),
@@ -145,6 +189,19 @@ async def stage_data(
     jupyter_token: Optional[str] = Query(None, description='Optional JupyterHub API token for interaction with Jupyter'),
     site_config: dict = Depends(get_config),
 ):
+    """
+    Stage data for a user.
+
+    Args:
+        request (StagingRequest): Request to stage data.
+        method (str): Method to use for staging data.
+        username (str): Username of the requester.
+        jupyter_token (Optional[str]): Optional JupyterHub API token for interaction with Jupyter.
+        site_config (dict): Application configuration.
+
+    Returns:
+        SuccessResponse: Successful response.
+    """
     logger.info(f"Received request with method= {method}, username={username}, data={request.data}")
     if method not in site_config["allowed_methods"]:
         logger.warning(f"Invalid method: {method}")
@@ -223,7 +280,12 @@ async def stage_data(
 
 @app.get("/logs/", response_class=PlainTextResponse)
 async def get_logs():
-    """Expose application logs."""
+    """
+    Expose application logs.
+
+    Returns:
+        dict: Application logs.
+    """
     log_file_path = "staging_service.log"  # Adjust path if necessary
     if not os.path.exists(log_file_path):
         raise HTTPException(status_code=404, detail="Log file not found")
@@ -237,12 +299,29 @@ async def get_logs():
 
 @app.get("/config/")
 async def get_site_config(site_config: dict = Depends(get_config)):
-    """Expose the full site configuration."""
+    """
+    Expose the full site configuration.
+
+    Args:
+        site_config (dict): Application configuration.
+
+    Returns:
+        dict: Full site configuration.
+    """
     return site_config
 
 @app.get("/config/allowed-methods/")
 async def get_site_allowed_methods(site_config: dict = Depends(get_config)):
-    """Expose only the allowed methods."""
+    """
+    Expose only the allowed methods.
+
+    Args:
+        site_config (dict): Application configuration.
+
+    Returns:
+        dict: Allowed methods.
+    """
+
     return {"allowed_methods": site_config["allowed_methods"]}
 
 @app.post("/create-file/")
@@ -251,7 +330,17 @@ async def create_file(
     content: str = Body(..., embed=True, description="Content of the file"),
     site_config: dict = Depends(get_config),
 ):
-    """Create a file in the source storage directory."""
+    """
+    Create a file in the source storage directory.
+
+    Args:
+        filename (str): Name of the file to create.
+        content (str): Content of the file.
+        site_config (dict): Application configuration.
+
+    Returns:
+        dict: Response.
+    """
     source_storage = site_config["source_storage_path"]
     file_path = os.path.join(source_storage, filename)
 

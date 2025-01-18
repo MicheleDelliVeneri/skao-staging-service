@@ -21,7 +21,17 @@ logger = logging.getLogger(__name__)
 
 
 def set_read_only(path, username):
-    """Set read-only permissions and ownership for a specific user."""
+    """
+    Set the given path (file or directory) to have read-only permissions (0o400 for files, 0o500 for directories)
+    and change the ownership to the given username.
+    
+    Args:
+        path (str): The path to the file or directory to set read-only.
+        username (str): The username to change the ownership to.
+    
+    Raises:
+        HTTPException: If the username does not exist.
+    """
     try:
         # Get UID and GID for the user
         user_info = pwd.getpwnam(username)
@@ -47,7 +57,15 @@ def set_read_only(path, username):
         raise HTTPException(status_code=400, detail=f"User {username} does not exist.")
 
 def ensure_user_exists(username: str):
-    """Ensure the user exists on the system. Create if it does not."""
+    """
+    Ensure that a user with the specified username exists on the system.
+    
+    Args:
+        username (str): The username to check and potentially create.
+    
+    Raises:
+        HTTPException: If there is an error in checking or creating the user.
+    """
     try:
         # Check if the user exists
         result = subprocess.run(

@@ -20,6 +20,23 @@ logger = logging.getLogger(__name__)
 # Staging method: Copy
 # --------------------------- COPY       --------------------------------------------
 def local_copy(local_path, relative_path):
+    """
+    Copies a file or directory from the local storage to the user area.
+
+    Parameters
+    ----------
+    local_path : str
+        Path to the file or directory on the local storage.
+    relative_path : str
+        Path to the file or directory relative to the user area.
+
+    Raises
+    ------
+    ValueError
+        If the path provided is invalid.
+    Exception
+        If any other error occurs during the copy operation.
+    """
     try:
         logger.info(f"Starting local_copy from {local_path} to {relative_path}")
         if os.path.isdir(local_path):
@@ -39,6 +56,23 @@ def local_copy(local_path, relative_path):
 # Staging method: Symlink
 # --------------------------- SYMLINK COPY --------------------------------------------
 def local_symlink(local_path, relative_path):
+    """
+    Creates a symlink from the local storage to the user area.
+
+    Parameters
+    ----------
+    local_path : str
+        Path to the file or directory on the local storage.
+    relative_path : str
+        Path to the file or directory relative to the user area.
+
+    Raises
+    ------
+    ValueError
+        If the path provided is invalid.
+    Exception
+        If any other error occurs during the symlink operation.
+    """
     try:
         logger.info(f"Starting local_symlink from {local_path} to {relative_path}")
         if os.path.isdir(local_path):
@@ -58,6 +92,26 @@ def local_symlink(local_path, relative_path):
 # Staging method: Direct Download
 # --------------------------- DIRECT DOWNLOAD --------------------------------------------
 def direct_download(local_path):
+    """
+    Serves a file from the local storage using a direct download.
+
+    Parameters
+    ----------
+    local_path : str
+        Path to the file on the local storage.
+
+    Returns
+    -------
+    FileResponse
+        A FileResponse object containing the file contents.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the file does not exist at the provided path.
+    Exception
+        If any other error occurs during the direct download operation.
+    """
     try:
         logger.info(f"Starting direct_download for path {local_path}")
 
@@ -77,6 +131,27 @@ def direct_download(local_path):
 # Staging method: Jupyter Copy
 # --------------------------- JUPYTER COPY --------------------------------------------
 def jupyter_copy(local_path, relative_path, username, token):
+    """
+    Copies a file from the local storage to the user's Jupyter server.
+
+    Parameters
+    ----------
+    local_path : str
+        Path to the file on the local storage.
+    relative_path : str
+        Path to the file relative to the user area.
+    username : str
+        Username of the user to copy the file for.
+    token : str
+        Token to use for authentication with the Jupyter server.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the file does not exist at the provided path.
+    Exception
+        If any other error occurs during the copy operation.
+    """
     try:
         logger.info(f"Starting jupyter_copy for user {username}")
 
