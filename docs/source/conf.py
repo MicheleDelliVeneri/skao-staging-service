@@ -9,7 +9,9 @@
 project = 'skao-staging-service'
 copyright = '2025, Michele Delli Veneri'
 author = 'Michele Delli Veneri'
-
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../../'))
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -17,6 +19,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx_autodoc_typehints',
+    'sphinxcontrib.httpdomain',
+
 ]
 
 

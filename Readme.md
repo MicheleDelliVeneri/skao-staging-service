@@ -3,6 +3,7 @@
 [![Qodana](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/qodana_code_quality.yml/badge.svg)](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/qodana_code_quality.yml)
 [![codecov](https://codecov.io/gh/MicheleDelliVeneri/skao-staging-service/branch/main/graph/badge.svg?token=8MHP9PACXY)](https://codecov.io/gh/MicheleDelliVeneri/skao-staging-service)
 [![Documentation Status](https://readthedocs.org/projects/skao-staging-service/badge/?version=latest)](https://skao-staging-service.readthedocs.io/en/latest/?badge=latest)
+
 A FastAPI service that stages data for SKAO analysis. This repository includes:
 
 - **FastAPI** code in [`app/staging_service.py`](app/staging_service.py)
@@ -14,6 +15,7 @@ A FastAPI service that stages data for SKAO analysis. This repository includes:
 
 For a complete description of the service, and its use check our documentation on
 [Read The Docs](https://skao-staging-service.readthedocs.io/en/latest/).
+The service is run in a Kubernates Cluster and it is installed and configured with Helm. 
 
 ## Build the service 
 1. Clone the repo: `git clone https://github.com/MicheleDelliVeneri/skao-staging-service.git`
