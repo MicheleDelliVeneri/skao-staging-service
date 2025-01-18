@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app
 
-ENTRYPOINT ["pytest", "tests/test_staging_service.py"]
+ENTRYPOINT ["pytest", "--cov=app", "--cov-report=xml", "tests"]

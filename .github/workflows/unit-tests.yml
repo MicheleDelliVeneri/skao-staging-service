@@ -31,10 +31,9 @@ jobs:
 
       # Step 4: Run unit tests with coverage
       - name: Run Unit Tests
-        env:
-          TEST_ENV: true
         run: |
-          pytest --cov=app --cov-report=xml tests
+          docker build -t ska-test -f  Dockerfile-staging-test .
+          docker run --rm ska-test
 
       # Step 5: Upload coverage report to Codecov
       - name: Upload Coverage to Codecov
