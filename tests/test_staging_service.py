@@ -3,6 +3,8 @@ from app.staging_service import app
 import os
 import stat
 import pytest
+import requests
+from unittest.mock import MagicMock, patch
 from fastapi import HTTPException
 from app.utility import ensure_user_exists
 
@@ -256,3 +258,61 @@ def test_user_permissions_after_creation():
     # Verify ownership (requires mock or careful setup in tests)
     file_stat = os.stat(file_path)
     assert file_stat.st_uid == os.getuid(), "File is not owned by the correct user"
+
+def test_direct_download():
+    """Test serving a file via direct download."""
+    response = client.post(
+        "/stage-data/?method=direct_download&username=test_user",
+        json={
+            "data": {
+                "local_path_on_storage": "/tmp/storage_a/data/file1.txt",
+                "relative_path": "unused"
+            }
+        }
+    )
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/octet-stream"
+    assert response.headers["content-disposition"].startswith("attachment")
+
+def test_direct_download_file_not_found():
+    """Test direct download with a non-existent file."""
+    response = client.post(
+        "/stage-data/?method=direct_download&username=test_user",
+        json={
+            "data": {
+                "local_path_on_storage": "/tmp/storage_a/data/missing_file.txt",
+                "relative_path": "unused"
+            }
+        }
+    )
+    assert response.status_code == 400
+    assert "Source path does not exist" in response.json()["detail"]
+
+
+def test_jupyter_copy_user_not_found():
+    """Test jupyter_copy with a missing user."""
+    username = "missing_user"
+    local_path = "/tmp/storage_a/data/test_file.txt"
+    relative_path = "project/test_file.txt"
+
+    with patch("app.jupyter_helper.requests.get") as mock_get:
+        # Mock user status check failure
+        mock_get.return_value = requests.Response()
+        mock_get.return_value.status_code = 404
+
+        response = client.post(
+            f"/stage-data/?method=jupyter_copy&username={username}",
+            json={
+                "data": {
+                    "local_path_on_storage": local_path,
+                    "relative_path": relative_path
+                }
+            }
+        )
+
+        assert response.status_code == 500
+        assert "Failed to fetch user status" in response.json()["detail"]
+        mock_get.assert_called_once()
+
+
+
