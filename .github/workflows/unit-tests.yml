@@ -32,14 +32,15 @@ jobs:
       # Step 4: Run unit tests with coverage
       - name: Run Unit Tests
         run: |
-          docker build -t ska-test -f  Dockerfile-staging-test .
-          docker run --rm ska-test
+          mkdir coverage_output  # Create a directory to store coverage
+          docker build -t ska-test -f Dockerfile-staging-test .
+          docker run --rm -v $(pwd)/coverage_output:/app/coverage_output ska-test
 
       # Step 5: Upload coverage report to Codecov
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
+          files: ./coverage_output/coverage.xml
           flags: unittests
           fail_ci_if_error: true
