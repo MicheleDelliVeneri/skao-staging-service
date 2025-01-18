@@ -62,16 +62,20 @@ A Helm chart for deploying the SKAO staging service
 |-----|------|---------|-------------|
 | config.allowedMethods[0] | string | `"local_copy"` |  |
 | config.allowedMethods[1] | string | `"local_symlink"` |  |
+| config.allowedMethods[2] | string | `"direct_download"` |  |
+| config.allowedMethods[3] | string | `"jupyter_copy"` |  |
 | config.jupyterHubUrl | string | `"https://jupyterhub"` |  |
 | config.rucioBaseUrl | string | `"https://rucio-instance"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"skao-staging-service"` |  |
 | image.tag | string | `"latest"` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.enabled | bool | `false` |  |
+| ingress.annotations."nginx.ingress.kubernetes.io/rewrite-target" | string | `"/"` |  |
+| ingress.enabled | bool | `true` |  |
 | ingress.hosts[0].host | string | `"staging-service.local"` |  |
 | ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
+| ingress.hosts[0].paths[1].path | string | `"/logs"` |  |
+| ingress.hosts[0].paths[1].pathType | string | `"ImplementationSpecific"` |  |
 | ingress.tls | list | `[]` |  |
 | logging.level | string | `"DEBUG"` |  |
 | replicaCount | int | `2` |  |
