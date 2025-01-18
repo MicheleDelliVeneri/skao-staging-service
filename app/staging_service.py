@@ -42,17 +42,17 @@ class DataItem(BaseModel):
     )
 
 class StagingRequest(BaseModel):
-     """
-    StagingRequest represents a request to stage data with a single data mapping.
+    """
+        StagingRequest represents a request to stage data with a single data mapping.
 
-    Attributes:
-        data (DataItem): Single data mapping with local and relative paths.
+        Attributes:
+            data (DataItem): Single data mapping with local and relative paths.
 
-    Example:
-        {
-            "local_path_on_storage": "/mnt/storage_a/data1",
-            "relative_path": "project/data1"
-        }
+        Example:
+            {
+                "local_path_on_storage": "/mnt/storage_a/data1",
+                "relative_path": "project/data1"
+            }
     """
     data: DataItem = Field(
         ...,
@@ -92,7 +92,7 @@ class SuccessResponse(BaseModel):
     )
 
 class ValidationError(BaseModel):
-     """
+    """
     Validation error model.
 
     Attributes:
