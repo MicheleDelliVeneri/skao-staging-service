@@ -17,10 +17,7 @@ author = 'Michele Delli Veneri'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
-    'sphinx_autodoc_typehints',
-    'sphinxcontrib.httpdomain',
-
+    'sphinx.ext.viewcode',  # Optional: Include source code links
 ]
 
 
