@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import '../styles/LogsViewer.css'; // Import the CSS file
 
 const LogsViewer = () => {
     const [logs, setLogs] = useState('');
@@ -20,7 +21,7 @@ const LogsViewer = () => {
     }, []);
 
     return (
-        <div>
+        <div className="logs-viewer">
             <h2>Logs</h2>
             <pre>{logs}</pre>
         </div>

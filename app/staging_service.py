@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query, Depends
+from fastapi import FastAPI, HTTPException, Query, Depends, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field, ConfigDict
@@ -234,6 +234,35 @@ async def get_logs():
     except Exception as e:
         logger.error(f"Error reading log file: {e}")
         raise HTTPException(status_code=500, detail="Could not read log file")
+
+@app.get("/config/")
+async def get_site_config(site_config: dict = Depends(get_config)):
+    """Expose the full site configuration."""
+    return site_config
+
+@app.get("/config/allowed-methods/")
+async def get_site_allowed_methods(site_config: dict = Depends(get_config)):
+    """Expose only the allowed methods."""
+    return {"allowed_methods": site_config["allowed_methods"]}
+
+@app.post("/create-file/")
+async def create_file(
+    filename: str = Body(..., embed=True, description="Name of the file to create"),
+    content: str = Body(..., embed=True, description="Content of the file"),
+    site_config: dict = Depends(get_config),
+):
+    """Create a file in the source storage directory."""
+    source_storage = site_config["source_storage_path"]
+    file_path = os.path.join(source_storage, filename)
+
+    try:
+        with open(file_path, "w") as f:
+            f.write(content)
+        logger.debug(f'File succesfully created in {file_path}')
+        return {"status": "success", "message": f"File '{filename}' created successfully in {file_path}."}
+    except Exception as e:
+        logger.error(f"Failed to create file '{filename}': {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create file: {e}")
 
 # ----------------------- FRONTEND ------------------------------------------------------
 

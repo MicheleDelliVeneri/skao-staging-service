@@ -1,11 +1,28 @@
-FROM python:3.13-slim
+FROM node:18 AS frontend
+WORKDIR /frontend
+# Copy React files and install dependencies
+COPY frontend/package.json frontend/package-lock.json /frontend/
+RUN npm install
+# Build the React application
+COPY frontend /frontend
+RUN npm run build
 
+# Build FastAPI backend
+
+FROM python:3.13-slim AS backend
+
+# Create a working directory
 WORKDIR /app
 
+# Copy requirement definitions
 COPY requirements.txt /app/
 
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the project files
 COPY . /app
+COPY app /app/app
+COPY --from=frontend /frontend/build /app/frontend/build
 
 ENTRYPOINT ["pytest", "--cov=app", "--cov-report=xml:/app/coverage_output/coverage.xml", "--junitxml=/app/coverage_output/junit.xml", "-o", "junit_family=legacy", "tests"]

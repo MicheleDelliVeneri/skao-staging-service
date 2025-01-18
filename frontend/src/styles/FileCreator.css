@@ -1,0 +1,59 @@
+.file-creator {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    margin: 20px 0;
+}
+
+.file-creator h3 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+.file-creator form {
+    display: flex;
+    flex-direction: column;
+}
+
+.file-creator label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.file-creator input, .file-creator textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.file-creator button {
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.file-creator button:hover {
+    background-color: #3498db;
+}
+
+.file-creator pre {
+    background-color: #f4f4f9;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: auto;
+    max-height: 200px;
+}
