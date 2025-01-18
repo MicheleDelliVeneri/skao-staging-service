@@ -130,7 +130,6 @@ def test_directory_staging_with_read_only_permissions():
     check_permissions(staged_file3, 0o400)
     check_permissions(staged_file4, 0o400)
 
-
 def test_invalid_method():
     """Test using an invalid staging method."""
     response = client.post(

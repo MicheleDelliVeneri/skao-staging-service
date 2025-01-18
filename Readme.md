@@ -27,7 +27,7 @@ A FastAPI service that stages data for SKAO analysis. This repository includes:
 2. Navigate to `http:127.0.0.1:MINIKUBEPORT/docs` where MINIKUBEPORT is the port obtained in step 5. 
 3. Set method to `local_copy`, set your `username` and add the following request body:
 ```
-   {
+{
   "data": {
     "local_path_on_storage": "/mnt/storage_a/File1.txt",
     "relative_path": "File1Copy.txt"
