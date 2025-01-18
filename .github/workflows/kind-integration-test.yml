@@ -29,7 +29,7 @@ jobs:
       # Deploy Helm Chart
       - name: Deploy Chart
         run: |
-          helm upgrade --install skao-staging-service ./charts/skao-staging-service --values ./charts/skao-staging-service/test-values.yaml
+          helm upgrade --install skao-staging-service ./charts/skao-staging-service --values ./charts/skao-staging-service/values.yaml
 
       # Test Deployment
       - name: Verify Pods
