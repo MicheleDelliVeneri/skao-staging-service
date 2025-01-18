@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException, Query, Depends
 from pydantic import BaseModel, Field, ConfigDict
 import os
-from typing import List
+from typing import List, Optional
 import json
 from app.staging_methods import AVAILABLE_METHODS
 from app.utility import set_read_only, ensure_user_exists
+from app.jupyter_helper import get_user_status
 import logging
 # FastAPI application
 app = FastAPI(title="SKAO Data Staging Service")
@@ -77,8 +78,9 @@ def get_config():
     return {
         "source_storage_path": os.getenv("SOURCE_STORAGE_PATH", "/tmp/storage_a"),
         "target_storage_path": os.getenv("TARGET_STORAGE_PATH", "/tmp/user_areas"),
-        "allowed_methods": json.loads(os.getenv("ALLOWED_METHODS", '["local_copy", "local_symlink"]')),
+        "allowed_methods": json.loads(os.getenv("ALLOWED_METHODS", '["local_copy", "local_symlink", "direct_download", "jupyter_copy"]')),
     }
+
 
 # --------------------------- API ENDPOINT --------------------------------------------
 @app.post(
@@ -138,53 +140,82 @@ async def stage_data(
     request: StagingRequest,
     method: str = Query(..., description="The method to use for staging data."),
     username: str = Query(..., description="The username of the requester."),
+    jupyter_token: Optional[str] = Query(None, description='Optional JupyterHub API token for interaction with Jupyter'),
     site_config: dict = Depends(get_config),
 ):
-    logger.info(f"Received request with method={method}, username={username}, data={request.data}")
+    logger.info(f"Received request with method= {method}, username={username}, data={request.data}")
     if method not in site_config["allowed_methods"]:
         logger.warning(f"Invalid method: {method}")
         raise HTTPException(status_code=400, detail=f"Invalid staging method: {method}")
 
-    # Ensure the user exists
-    ensure_user_exists(username)
+    # Check User existence on the pod for methods using local storage
+    if method == 'local_copy' or method == 'local_symlink':
+        # Ensure the user exists
+        ensure_user_exists(username)
+    # Check User Existence on the JupyterHub Server
+    if method == 'jupyter_copy':
+        user_status = get_user_status(username)
 
-    # Load Source and Target storage
+    # Load Source Storage and Local Path
     source_storage = site_config['source_storage_path']
-    target_storage = site_config['target_storage_path']
-    logger.debug(f"Loaded Source Storage: {source_storage}")
-    logger.debug(f"Loaded Target Storage: {target_storage}")
-    # Create User Directory if it does not exist
-    user_area = os.path.join(target_storage, username)
-    os.makedirs(user_area, exist_ok=True)
-    logger.debug(f"User area created: {user_area}")
-    # Extract local path and target path
     local_path = os.path.join(source_storage, request.data.local_path_on_storage)
-    target_path = os.path.join(user_area, request.data.relative_path)
-    logger.debug(f"Processing {local_path} -> {target_path}")
     # Check if source exists
     if not os.path.exists(local_path):
         logger.error(f"Source path does not exist: {local_path}")
         raise HTTPException(status_code=400, detail=f"Source path does not exist: {local_path}")
-    # Ensure the target directory exists
-    os.makedirs(os.path.dirname(target_path), exist_ok=True)
-    # Apply the chosen method
-    if not os.path.exists(target_path):
-        try:
-            AVAILABLE_METHODS[method](local_path, target_path)
-            logger.debug(f"Applied method {method} on {local_path}")
-            # Set read-only
-            set_read_only(target_path, username)
-            logger.debug(f"Set read-only permissions for {target_path}")
+    logger.debug(f"Loaded Source Storage: {source_storage}")
 
+    if method == 'direct_download':
+        try:
+            return AVAILABLE_METHODS[method](local_path)
+        except Exception as e:
+            logger.error(f"Error during direct download: {e}")
+            raise HTTPException(status_code=500, detail=f"Error during direct download: {str(e)}")
+    if method == 'jupyter_copy':
+        try:
+            AVAILABLE_METHODS[method](local_path, request.data.relative_path, username, jupyter_token)
+            logger.debug(f"Applied method {method} on {local_path}")
         except HTTPException as e:
             logger.error(f"HTTPException: {e.detail}")
             raise e
         except Exception as e:
             logger.exception(f"Unexpected error: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
-
         logger.info(f"Data staged successfully for user {username} with method {method}")
         return {"status": "success", "message": f"Data staged for user {username} with method {method}"}
     else:
-        logger.info(f"Data is already available at {target_path}")
-        return {"status": "success", "message": f"Data already available at {target_path}"}
+        target_storage = site_config['target_storage_path']
+        logger.debug(f"Loaded Target Storage: {target_storage}")
+        # Create User Directory if it does not exist
+        user_area = os.path.join(target_storage, username)
+        os.makedirs(user_area, exist_ok=True)
+        logger.debug(f"User area created: {user_area}")
+        # Extract local path and target path
+
+        target_path = os.path.join(user_area, request.data.relative_path)
+        logger.debug(f"Processing {local_path} -> {target_path}")
+
+         # Ensure the target directory exists
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        # Apply the chosen method
+        if not os.path.exists(target_path):
+            try:
+                AVAILABLE_METHODS[method](local_path, target_path)
+                logger.debug(f"Applied method {method} on {local_path}")
+                # Set read-only
+                set_read_only(target_path, username)
+                logger.debug(f"Set read-only permissions for {target_path}")
+
+            except HTTPException as e:
+                logger.error(f"HTTPException: {e.detail}")
+                raise e
+            except Exception as e:
+                logger.exception(f"Unexpected error: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+            logger.info(f"Data staged successfully for user {username} with method {method}")
+            return {"status": "success", "message": f"Data staged for user {username} with method {method}"}
+        else:
+            logger.info(f"Data is already available at {target_path}")
+            return {"status": "success", "message": f"Data already available at {target_path}"}
+
+

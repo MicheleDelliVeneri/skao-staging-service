@@ -2,18 +2,23 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+# Number of replicas for the deployment
+# Default: 1
 replicaCount: 2
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
   repository: skao-staging-service
+  # Image tag to use
+  # Default: latest
   tag: latest
   pullPolicy: IfNotPresent
 
-# Port for the service, can be changed to LoadBalancer
+# Type of service (e.g., ClusterIP, NodePort, LoadBalancer)
+# Default: NodePort
 service:
   type: NodePort
+  # The Node Port
   port: 8000
 
 # Set up for DNS and Proxy
@@ -72,5 +77,7 @@ config:
   rucioBaseUrl: "https://rucio-instance"
   jupyterHubUrl: "https://jupyterhub"
   allowedMethods:
-    - local_copy
-    - local_symlink
+    - local_copy  # Copy between two locally mounted POSIX FS
+    - local_symlink # Symlink between two locally mounted POSIX FS
+    - direct_download # Direct Download from the locally mounted SOURCE Storage
+    - jupyter_copy # Copy between the locally mounted source storage and the user jupyterhub workspace

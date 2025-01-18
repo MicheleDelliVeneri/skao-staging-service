@@ -1,6 +1,6 @@
 apiVersion: v2
 name: skao-staging-service
-description: A Helm chart for Kubernetes
+description: A Helm chart for deploying the SKAO staging service
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -22,6 +22,20 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "latest"
+
+# Maintainers of the chart
+maintainers:
+  - name: Michele
+    email: micheledelliveneri@gmail.com
+
+# Source code repository
+sources:
+  - https://github.com/MicheleDelliVeneri/skao-staging-service
+
+keywords:
+  - staging
+  - SKAO
+  - FastAPI
 
 image:
   repository: skao-staging-service

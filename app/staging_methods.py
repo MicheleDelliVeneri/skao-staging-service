@@ -1,6 +1,9 @@
 import os
 from shutil import copy, copytree
 import logging
+from fastapi.responses import FileResponse
+from app.jupyter_helper import get_user_status, start_user_server
+import requests
 
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO").upper()
 # Set up logging
@@ -15,6 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Staging method: Copy
+# --------------------------- COPY       --------------------------------------------
 def local_copy(local_path, relative_path):
     try:
         logger.info(f"Starting local_copy from {local_path} to {relative_path}")
@@ -33,6 +37,7 @@ def local_copy(local_path, relative_path):
         raise
 
 # Staging method: Symlink
+# --------------------------- SYMLINK COPY --------------------------------------------
 def local_symlink(local_path, relative_path):
     try:
         logger.info(f"Starting local_symlink from {local_path} to {relative_path}")
@@ -49,10 +54,78 @@ def local_symlink(local_path, relative_path):
     except Exception as e:
         logger.error(f"Error during local_symlink from {local_path} to {relative_path}: {e}")
         raise
-# Add more methods as needed
 
-# Dictionary of available methods
+# Staging method: Direct Download
+# --------------------------- DIRECT DOWNLOAD --------------------------------------------
+def direct_download(local_path):
+    try:
+        logger.info(f"Starting direct_download for path {local_path}")
+
+        if not os.path.exists(local_path):
+            logger.error(f"File not found at path: {local_path}")
+            raise FileNotFoundError(f"File not found at path: {local_path}")
+
+        # Return a FileResponse for FastAPI to serve the file
+        logger.info(f"Serving file from path: {local_path}")
+        return FileResponse(local_path, media_type='application/octet-stream', filename=os.path.basename(local_path))
+
+    except Exception as e:
+        logger.error(f"Error during direct_download: {e}")
+        raise
+
+
+# Staging method: Jupyter Copy
+# --------------------------- JUPYTER COPY --------------------------------------------
+def jupyter_copy(local_path, relative_path, username, token):
+    try:
+        logger.info(f"Starting jupyter_copy for user {username}")
+
+        # Ensure the server is running
+        hub_url = os.getenv("JUPYTERHUB_URL", "http://localhost:8080")
+        user_status = get_user_status(username)
+
+        if "servers" not in user_status or not user_status["servers"]:
+            logger.info(f"Server not running for user {username}. Starting server...")
+            start_user_server(username, hub_url)
+
+        # Refresh user status
+        user_status = get_user_status(username)
+        server_info = user_status.get("servers", {}).get("", None)
+        if not server_info or not server_info.get("ready", False):
+            raise Exception(f"Failed to start or verify readiness of server for user {username}.")
+
+        # Check if the file exists on the Jupyter server
+        jupyter_path = relative_path
+        url = f"{hub_url}/hub/api/users/{username}/servers/{jupyter_path}/api/contents/{jupyter_path}"
+        headers = {"Authorization": f"token {token}", "Content-Type": "application/json"}
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            logger.info(f"File already exists at {jupyter_path} for user {username}")
+            return
+
+        # File does not exist; proceed with the copy
+        with open(local_path, 'rb') as file:
+            data = {
+                "content": file.read().decode('utf-8'),
+                "format": "text",
+                "type": "file"
+            }
+            response = requests.put(url, headers=headers, json=data)
+
+            if response.status_code not in [200, 201]:
+                raise Exception(f"Failed to copy file: {response.status_code} - {response.text}")
+
+        logger.info(f"Successfully copied file to {jupyter_path} for user {username}")
+
+    except Exception as e:
+        logger.error(f"Error during jupyter_copy for user {username}: {e}")
+        raise
+
+# Add jupyter_copy to AVAILABLE_METHODS
 AVAILABLE_METHODS: dict[str, callable] = {
     "local_copy": local_copy,
     "local_symlink": local_symlink,
+    "jupyter_copy": jupyter_copy,
+    "direct_download": direct_download,
 }
