@@ -32,6 +32,7 @@ class DataItem(BaseModel):
         local_path_on_storage (str): Local path on storage where the file currently resides.
         relative_path (str): Relative path inside the user area where the file should be made available.
     """
+
     local_path_on_storage: str = Field(
         ...,
         description="Local path on storage where the file currently resides."
@@ -54,6 +55,7 @@ class StagingRequest(BaseModel):
                 "relative_path": "project/data1"
             }
     """
+
     data: DataItem = Field(
         ...,
         description="Single data mapping with local and relative paths.",
@@ -79,6 +81,7 @@ class SuccessResponse(BaseModel):
             "message": "Data staged for user test_user with method local_copy"
         }
     """
+
     status: str
     message: str
 
@@ -103,6 +106,7 @@ class ValidationError(BaseModel):
             "detail": "Invalid request"
         }
     """
+
     detail: str
 
     model_config = ConfigDict(
