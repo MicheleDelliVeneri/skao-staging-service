@@ -3,8 +3,14 @@
 [![Qodana](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/qodana_code_quality.yml/badge.svg)](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/qodana_code_quality.yml)
 [![codecov](https://codecov.io/gh/MicheleDelliVeneri/skao-staging-service/branch/main/graph/badge.svg?token=8MHP9PACXY)](https://codecov.io/gh/MicheleDelliVeneri/skao-staging-service)
 [![Documentation Status](https://readthedocs.org/projects/skao-staging-service/badge/?version=latest)](https://skao-staging-service.readthedocs.io/en/latest/?badge=latest)
+[![Unit Tests](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/unit-tests.yml)
+[![Docker Tests](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/docker-tests.yml/badge.svg)](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/docker-tests.yml)
+[![Qodana](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/qodana_code_quality.yml/badge.svg)](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/qodana_code_quality.yml)
+[![Helm Tests](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/helm-tests.yml/badge.svg)](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/helm-tests.yml)
+[![Helm Integration Tests with Kind](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/kind-integration-test.yml/badge.svg)](https://github.com/MicheleDelliVeneri/skao-staging-service/actions/workflows/kind-integration-test.yml)
 
-A FastAPI service that stages data for SKAO analysis. This repository includes:
+
+for SKAO analysis. This repository includes:
 
 - **FastAPI** code in [`app/staging_service.py`](app/staging_service.py)
 - **Tests** in [`tests/test_staging_service.py`](tests/test_staging_service.py)
