@@ -11,11 +11,11 @@ The main components of the service are:
 1. The SKAO Staging Service: constituted by the **FastAPI** backend and a **React Frontend**.
 The service provides a POST API endpoint at `service_url/stage_data`. This endpoint accepts the following inputs:
     - Query Parameters:
-        method: Specifies the staging method to be used.
-        username: The name of the user initiating the staging request.
+        * method: Specifies the staging method to be used.
+        * username: The name of the user initiating the staging request.
     - Request Body (JSON):
-        local_path_on_storage: The source path of the data to be staged.
-        relative_path: The destination path relative to the user's storage area.
+        * local_path_on_storage: The source path of the data to be staged.
+        * relative_path: The destination path relative to the user's storage area.
 The API processes these inputs to perform the requested staging operation with the selected `Method`.
 In case the data is not available, or the method is not compatible with those implemented at the site where the
 service is hosted, the API returns an Error. At this moment the following staging methods have been implemented:
