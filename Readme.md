@@ -20,14 +20,13 @@ The service is run in a Kubernates Cluster and it is installed and configured wi
 ## Build the service 
 1. Clone the repo: `git clone https://github.com/MicheleDelliVeneri/skao-staging-service.git`
 2. configure your shell environment so that Docker commands run on your local machine interact with the Docker daemon inside the Minikube virtual machine, rather than the Docker daemon on your local host `eval $(minikube docker-env)
-`.
+`
 3. Build the docker image: `docker build -t skao-staging-service:latest .`
 3. Modify the Helm Chart values to reflect your configuration
 4. Run the Helm Chart: `helm install skao-staging-service ./charts/skao-staging-service --set image.repository=skao-staging-service --set image.tag=latest
 `
 5. (Minikube) Create Tunnel: `minikube service skao-staging-service --url`
-6. if you are using minikube, before 1 -5,  switch to minikube docker env with `eval $(minikube docker-env)
-`
+
 ## Test The Service with FastAPI Tests
 1. Create two local directories on the Host Machine, one for simulating the local storage, and another to simulate the target user area. These will be mounted in the application pod.
 2. Set the paths of the two directories in the Helm Values.yaml file, one as the `storage.source.local.hostPath` and the other as the `userArea.source.local.hostPath`
@@ -35,21 +34,28 @@ The service is run in a Kubernates Cluster and it is installed and configured wi
 This file simulates the file that the user want to stage from the local storage to its user area. 
 4. Navigate to `http:127.0.0.1:MINIKUBEPORT/docs` where MINIKUBEPORT is the port obtained in step 5. 
 5. Set method to `local_copy`, set your `username` and add the following request body:
-```
-{
-  "data": {
-    "local_path_on_storage": "/mnt/storage_a/File1.txt",
-    "relative_path": "File1Copy.txt"
-  }
-}
-```
-You should see a Succesfull response 
-```
-{
-  "status": "success",
-  "message": "Data staged for user michele with method local_copy"
-}
-```
+    ``` 
+    {
+      "data": {
+        "local_path_on_storage": "/mnt/storage_a/File1.txt",
+        "relative_path": "File1Copy.txt"
+      }
+    }
+    ```
+    You should see a succesful response 
+    ```
+    {
+    "status": "success",
+    "message": "Data staged for user michele with method local_copy"
+    }
+6. Check the file copy 
+    ```
+    kubectl get pods
+    kubectl exec -it skao-staging-service-pod -- ls -la /mnt/storage_b/user_areas/File1Copy.txt
+    ```
+   
+
+
 ## Test The Service with Frontend
 1. Navigate to the url provided by `minikube service skao-staging-service --url`
 2. Create a File with the FileCreation Tool 
