@@ -51,6 +51,7 @@ The service also includes a frontend interface that provides the following funct
 
 This frontend enhances the usability of the API by providing an intuitive interface for staging data, viewing logs, and testing the service.
 See the image below for a visual representation of the interface.
+
 .. image:: images/frontend.png
     :alt: Frontend
     :align: center
