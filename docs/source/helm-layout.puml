@@ -1,0 +1,72 @@
+@startuml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/kubernetes_Common.puml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/kubernetes_Context.puml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/kubernetes_Simplified.puml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/kubernetes_C4.puml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/kubernetes_Container.puml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/OSS/KubernetesPod.puml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/OSS/KubernetesPsp.puml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/OSS/KubernetesPv.puml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/OSS/KubernetesPvc.puml
+!include /Volumes/FastStorage/GitHub/kubernetes-PlantUML/dist/OSS/all.puml
+actor "User" as userAlias
+left to right direction
+
+Cluster_Boundary(cluster, "Kubernetes Cluster") {
+    Namespace_Boundary(ns, "Staging") {
+        KubernetesIng(ingress, "endpoint", "")
+        KubernetesSvc(svc, "service", "")
+        KubernetesPod(pod1, "staging-r1", "")
+        KubernetesPod(pod2, "staging-r2", "")
+        KubernetesRs(rs, stagin-rs,"")
+        KubernetesPv(pv2, "local-storage", " ")
+        KubernetesPv(pv3, "user-area", " ")
+        KubernetesPvc(pvc3, "A-pvc", " ")
+        KubernetesPvc(pvc4, "B-pvc", " ")
+       }
+    Namespace_Boundary(nsFrontEnd, "Database") {
+        KubernetesPod(pod3, "MySQL-s1", "")
+        KubernetesPvc(pvc, "MySQL-pvc-s1", "")
+        KubernetesPod(pod4, "MySQL-s2", "")
+        KubernetesPvc(pvc2, "MySQL-pvc-s2", "")
+        KubernetesSts(sts, 'MySQL-sts', "")
+        KubernetesPv(pv, "MySQL-bv", "")
+        KubernetesSvc(svc2, "MySQL-svc", " ")
+    }
+    Namespace_Boundary(nsJupyter, "Jupyter"){
+        KubernetesApi(jup, "Jupyter-api", " ")
+
+    }
+    KubernetesDeploy(deploy,"deployment","")
+    KubernetesHpa(hpa, "HPA", "")
+}
+Rel(userAlias,ingress," ")
+Rel(ingress,svc," ")
+Rel(svc,pod1," ")
+Rel(svc,pod2," ")
+Rel_U(rs,pod1," ")
+Rel_U(rs,pod2," ")
+Rel_U(deploy,rs, " ")
+Rel_U(hpa,deploy, " ")
+Rel(pod1, svc2, " ")
+Rel(pod2, svc2, " ")
+Rel(svc2, pod3, " ")
+Rel(svc2, pod4, " ")
+Rel(pod3, pvc, " ")
+Rel(pod4, pvc2, " ")
+Rel(pvc, pv, " ")
+Rel(pvc2, pv, " ")
+Rel_U(sts,pod3," ")
+Rel_U(sts,pod4," ")
+Rel_U(deploy, sts, " ")
+Rel(jup, svc, " ")
+Rel(svc, jup, " ")
+Rel(pod1, pvc3, " ")
+Rel(pod1, pvc4, " ")
+Rel(pvc3, pv2, " ")
+Rel(pvc4, pv3, " ")
+Rel(pod2, pvc3, " ")
+Rel(pod2, pvc4, " ")
+
+
+@enduml

@@ -1,0 +1,91 @@
+@startuml
+' Start of the diagram
+start
+:Receive API request at /stage-data/;
+:Parse and validate request;
+:Load source storage path;
+if (Source path exists?) then (yes)
+    : Load site available methods;
+  if (Staging method valid?) then (yes)
+    if (Method is local_copy or local_symlink?) then (yes)
+        if (Ensure local user exists) then (yes)
+        else (no)
+            :create User;
+            :create User directory in user_area;
+        endif
+        if (Target Path Exists) then (yes)
+            :Return success response;
+            stop
+        else (no)
+            :Create target directory;
+            :Apply staging method (e.g., copy, symlink);
+            :Set read-only permissions;
+            :Return success response;
+            stop
+        endif
+    else (no)
+        if (Method is jupyer_copy?) then (yes)
+             :Send GET request for user status;
+             if (Request successful?) then (yes)
+                 :Return user status (JSON);
+            else (no)
+                :Return error: "User does not exists";
+                 stop
+            endif
+            :Ensure Jupyter user server is running;
+            if (Server running?) then (yes)
+                :Verify server readiness;
+            else (no)
+                :Start user server;
+                :Verify server readiness;
+            endif
+            if (Server ready?) then (yes)
+                :Check if file exists on the Jupyter server;
+                if (File exists?) then (yes)
+                    :Return success response;
+                    stop
+                else (no)
+                    :Send PUT request to JupyterHub API to copy file;
+                    if (Request successful?) then (yes)
+                        :Send PUT request to JupyterHub API to set file ACL;
+                        if (Request successful?) then (yes)
+                            : Return success response;
+                            stop
+                        else (no)
+                            : Return error: "Cannot set ACL";
+                            stop
+                        endif
+                    else (no)
+                        : Return  error: "Cannot copy file on JupyterHub";
+                        stop
+                    endif
+
+                endif
+            else (no)
+                :Return error: "Cannot start user server" ;
+                stop
+            endif
+    else (no)
+        if (Method is direct_download?) then (yes)
+            :Serve file using FileResponse;
+            :Return success response;
+            stop
+        else
+            stop
+        endif
+    endif
+  endif
+
+  else (no)
+    :Return error: "Invalid staging method";
+    stop
+  endif
+else (no)
+    :Return error: "Source path does not exist";
+    stop
+endif
+
+
+
+
+@enduml

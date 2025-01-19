@@ -1,0 +1,63 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+package "SKAO Staging Service" {
+  [React Frontend]
+  [FastAPI Backend]
+}
+
+database "MySql" {
+  folder "skao-staging-database" {
+    [Schema]
+    [site methods]
+    [site storages]
+  }
+  }
+
+  node "Storage A (Ceph)" {
+    [Local Data]
+    }
+
+  node "Storage B (NFS)" {
+    [User Area]
+    }
+
+  package "IndigoIAM" {
+  }
+
+  cloud "User" {
+  }
+
+  package "Jupyter Hub" {
+    [User Workspace]
+  }
+
+  json JSON {
+   "ID":"1",
+   "user":"michele",
+   "source": "Storage A/Local Data",
+   "destination": "Storage B/User Data",
+   "status": "Completed",
+   "error": "None"
+    }
+
+
+
+
+[User] --> [React Frontend] : GUI
+[User] --> [FastAPI Backend] : rest API
+[FastAPI Backend] --> [IndigoIAM] : Authorize Authenticate
+[IndigoIAM] --> [FastAPI Backend]
+[FastAPI Backend] --> [Storage A (Ceph)] : Mount
+[FastAPI Backend] --> [Storage B (NFS)] : Mount
+[Local Data] --> [User Area] : Copy data with Method X
+[Local Data] --> [User Workspace] : Copy
+[FastAPI Backend] --> [JSON]
+[JSON] --> [Schema]
+@enduml
+
+
+
+[Another Component] --> [Example 1]
+[Example 1] --> [Folder 3]
+[Folder 3] --> [Frame 4]
