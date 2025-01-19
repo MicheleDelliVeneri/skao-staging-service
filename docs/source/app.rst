@@ -1,10 +1,10 @@
-app package
+Modules
 ===========
 
 Submodules
 ----------
 
-app.jupyter\_helper module
+Jupyter Helper Module
 --------------------------
 
 .. automodule:: app.jupyter_helper
@@ -12,7 +12,7 @@ app.jupyter\_helper module
    :undoc-members:
    :show-inheritance:
 
-app.rucio\_helper module
+Rucio Helper Module
 ------------------------
 
 .. automodule:: app.rucio_helper
@@ -20,7 +20,7 @@ app.rucio\_helper module
    :undoc-members:
    :show-inheritance:
 
-app.staging\_methods module
+Staging Method Module
 ---------------------------
 
 .. automodule:: app.staging_methods
@@ -28,7 +28,7 @@ app.staging\_methods module
    :undoc-members:
    :show-inheritance:
 
-app.staging\_service module
+Staging Service Module
 ---------------------------
 
 .. automodule:: app.staging_service
@@ -36,7 +36,7 @@ app.staging\_service module
    :undoc-members:
    :show-inheritance:
 
-app.utility module
+Utility Module
 ------------------
 
 .. automodule:: app.utility

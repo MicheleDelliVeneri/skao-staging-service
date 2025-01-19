@@ -1,4 +1,4 @@
-app
+Module Reference Documentation
 ===
 
 .. toctree::
