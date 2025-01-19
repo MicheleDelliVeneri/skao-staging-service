@@ -29,16 +29,16 @@ and an user Jupyter server working directory.
 Overview
 --------
 .. image:: staging-service-schema.png
-   :alt: Staging Service Schema
-   :align: center
+    :alt: Staging Service Schema
+    :align: center
 
 
 Helm Deployment Schema
 **********
 
 .. image:: helm-layout.png
-   :alt: Helm Deployment Schema
-   :align: center
+    :alt: Helm Deployment Schema
+    :align: center
 
 The service relies on some underlying assumptions:
 
@@ -51,9 +51,8 @@ API Schema
 **********
 
 .. image:: logical-flow.png
-   :alt: Application Flow
-   :align: center
-
+    :alt: Application Flow
+    :align: center
 
 
 Contents
