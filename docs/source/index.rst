@@ -35,6 +35,7 @@ The documentation is structured as follows:
         provides an overview of the Kubernetes components deployed using Helm and lists the configurable variables defined in the values.yaml file.
     - :ref:`API Schema`:
         outlines the logical flow of a FastAPI service that handles data staging operations.
+    - :ref:`Api Documentation`: outlines the  documentation for every implemented method.
 
 Overview
 --------
