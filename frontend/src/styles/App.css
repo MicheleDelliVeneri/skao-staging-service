@@ -1,0 +1,62 @@
+.app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.app-title {
+    font-size: 2rem; /* Adjust the title font size */
+    font-weight: bold;
+    color: #2c3e50; /* Professional dark gray */
+    text-align: center; /* Center the title */
+    margin-top: 0; /* Remove default margin */
+}
+
+.app-header {
+    display: flex;
+    flex-direction: column; /* Stack image and title vertically */
+    align-items: center; /* Center-align both elements */
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.app-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.header-logo {
+    max-width: 200px; /* Limit the logo width */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 10px; /* Add spacing below the logo */
+}
+
+.footer-logo {
+    max-width: 200px; /* Limit the logo size */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two equal columns for top row */
+    grid-template-rows: auto auto; /* Two rows: top and bottom */
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.grid-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logs {
+    grid-column: 1 / span 2; /* Span both columns for LogsViewer */
+}

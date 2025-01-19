@@ -40,75 +40,65 @@ const StagingForm = () => {
     };
 
     return (
-        <div>
-            <header>
-                <img src="./skao_logo.jpg" alt="Header" />
-            </header>
-
-            <div>
-                <h2>Staging Form</h2>
-                <form onSubmit={handleSubmit}>
-                    <label htmlFor="method">Method</label>
-                    <select
-                        id="method"
-                        value={method}
-                        onChange={(e) => setMethod(e.target.value)}
-                        required
-                    >
-                        <option value="" disabled>
-                            Select a Method
+        <div className="staging-form">
+            <h2>Staging Form</h2>
+            <form onSubmit={handleSubmit}>
+                <label htmlFor="method">Method</label>
+                <select
+                    id="method"
+                    value={method}
+                    onChange={(e) => setMethod(e.target.value)}
+                    required
+                >
+                    <option value="" disabled>
+                        Select a Method
+                    </option>
+                    {methods.map((m) => (
+                        <option key={m} value={m}>
+                            {m}
                         </option>
-                        {methods.map((m) => (
-                            <option key={m} value={m}>
-                                {m}
-                            </option>
-                        ))}
-                    </select>
+                    ))}
+                </select>
 
-                    <label htmlFor="username">Username</label>
-                    <input
-                        type="text"
-                        id="username"
-                        placeholder="Username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
+                <label htmlFor="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                />
 
-                    <label htmlFor="localPath">Local Path</label>
-                    <input
-                        type="text"
-                        id="localPath"
-                        placeholder="Local Path"
-                        value={localPath}
-                        onChange={(e) => setLocalPath(e.target.value)}
-                        required
-                    />
+                <label htmlFor="localPath">Local Path</label>
+                <input
+                    type="text"
+                    id="localPath"
+                    placeholder="Local Path"
+                    value={localPath}
+                    onChange={(e) => setLocalPath(e.target.value)}
+                    required
+                />
 
-                    <label htmlFor="relativePath">Relative Path</label>
-                    <input
-                        type="text"
-                        id="relativePath"
-                        placeholder="Relative Path"
-                        value={relativePath}
-                        onChange={(e) => setRelativePath(e.target.value)}
-                        required
-                    />
+                <label htmlFor="relativePath">Relative Path</label>
+                <input
+                    type="text"
+                    id="relativePath"
+                    placeholder="Relative Path"
+                    value={relativePath}
+                    onChange={(e) => setRelativePath(e.target.value)}
+                    required
+                />
 
-                    <button type="submit">Submit</button>
-                </form>
+                <button type="submit">Submit</button>
+            </form>
 
-                {response && (
-                    <div>
-                        <h3>Response</h3>
-                        <pre>{JSON.stringify(response, null, 2)}</pre>
-                    </div>
-                )}
-            </div>
-
-            <footer>
-                <img src="skao_logo.jpg" alt="Footer" />
-            </footer>
+            {response && (
+                <div>
+                    <h3>Response</h3>
+                    <pre>{JSON.stringify(response, null, 2)}</pre>
+                </div>
+            )}
         </div>
     );
 };

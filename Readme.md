@@ -19,7 +19,9 @@ The service is run in a Kubernates Cluster and it is installed and configured wi
 
 ## Build the service 
 1. Clone the repo: `git clone https://github.com/MicheleDelliVeneri/skao-staging-service.git`
-2. Build the docker image: `docker build -t skao-staging-service:latest .`
+2. configure your shell environment so that Docker commands run on your local machine interact with the Docker daemon inside the Minikube virtual machine, rather than the Docker daemon on your local host `eval $(minikube docker-env)
+`.
+3. Build the docker image: `docker build -t skao-staging-service:latest .`
 3. Modify the Helm Chart values to reflect your configuration
 4. Run the Helm Chart: `helm install skao-staging-service ./charts/skao-staging-service --set image.repository=skao-staging-service --set image.tag=latest
 `
