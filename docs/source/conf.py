@@ -31,4 +31,9 @@ master_doc = 'index'
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ['_static']
+html_theme_options = {
+    "navigation_depth": 2,  # Adjust depth as needed
+    "collapse_navigation": False,  # Keep the sidebar expanded
+    "titles_only": False,  # Show subsections in the navigation
+}
 pygments_style = 'sphinx'
