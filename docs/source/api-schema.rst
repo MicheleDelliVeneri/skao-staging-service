@@ -9,6 +9,6 @@ request to ensure the integrity and success of the operation.
     :alt: Application Flow
     :align: center
 
-See tge module reference documentation for the SKAO staging service
+See the module reference documentation for the SKAO staging service
 for a detailed descriptions of all available functions, their parameters,
 return values, and exceptions.
