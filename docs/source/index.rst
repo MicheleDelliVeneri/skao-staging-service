@@ -407,7 +407,7 @@ of the service.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: API Documentation:
 
    modules
 
