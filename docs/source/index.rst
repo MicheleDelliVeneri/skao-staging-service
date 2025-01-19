@@ -108,7 +108,9 @@ The application maintains detailed logging of all operations in a dedicated log 
 Each operation, including data staging requests, file checks, and copy actions, is recorded with relevant
 details. This logging provides a comprehensive history of all activities,
 facilitating troubleshooting and auditing.
+
 Key Points About Logging:
+
 - Operation Details:
     The logs capture key information, such as the method invoked, user details, paths involved, and operation outcomes.
 - Error Tracking:
@@ -121,7 +123,7 @@ Key Points About Logging:
 By logging every operation to a file, the application ensures transparency and provides administrators with the tools needed to monitor the service and address potential issues effectively.
 
 Assumptions and Simplifications for the Demo
-******
+-----
 
 To create a functional demo of the service, several underlying assumptions about data operations conducted prior to receiving the data staging request are made. These assumptions are as follows:
 
@@ -136,7 +138,7 @@ The service assumes that:
 
 
 Helm Deployment
-**********
+-----
 The SKAO Staging Service is deployed using Kubernetes and Helm,
 leveraging a modular architecture to manage data staging operations efficiently.
 This Helm chart is designed to deploy the service along with all necessary resources,
@@ -155,6 +157,7 @@ components and configurations. Also an image shows the components after a succes
         Defined in the replicaCount value, this is set to 2 by default to ensure fault tolerance and load balancing.
     - Environment Variables:
         Several environment variables are passed to the pods to configure runtime behavior, such as:
+
         - ALLOWED_METHODS:
             Specifies supported staging methods (local_copy, local_symlink, etc.).
         - SOURCE_STORAGE_PATH and TARGET_STORAGE_PATH:
@@ -165,12 +168,13 @@ components and configurations. Also an image shows the components after a succes
         Mounts for storage are configured to allow seamless access to the source and user area storage.
 2. Service
     The Service resource provides network access to the pods.
+
     - Service Type:
         Set to NodePort by default, exposing the service on a specific port to external traffic.
-         - Port:
-            Configured to listen on port 8000, which is used by the SKAO Staging Service API.
+         - Port: Configured to listen on port 8000, which is used by the SKAO Staging Service API.
 3. Ingress
     The Ingress resource routes external HTTP requests to the service.
+
     - Ingress Rules:
         Hosts and paths are defined to route traffic to the staging API (/stage_data), frontend (/) and logs endpoint (/logs).
         Annotations configure NGINX to handle path rewriting.
@@ -178,6 +182,7 @@ components and configurations. Also an image shows the components after a succes
         Optional TLS configuration can be added to secure communication via HTTPS.
 4. Persistent Storage
     The Helm chart supports multiple storage backends for source data and user areas.
+
     - Local Storage:
         Default storage type, where hostPath is used to mount directories from the host machine into the pods.
     - NFS Storage:
@@ -186,12 +191,14 @@ components and configurations. Also an image shows the components after a succes
         For scalable, distributed storage solutions, Ceph can be used with custom options (e.g., authentication secrets).
 5. JupyterHub Integration
     The deployment integrates with a JupyterHub instance, allowing data to be staged directly into a user's working directory.
+
     - JupyterHub URL:
         Configured via JUPYTERHUB_URL, the service interacts with the JupyterHub API to query user information, start/stop servers, and stage files.
     - Token-Based Authentication:
         A token is preconfigured to enable secure communication with JupyterHub or provided as custom query parameter to the staging API.
 6. Database
     The MySQL database backend is deployed to store metadata about data staging operations.
+
     - MySQL Deployment:
         A dedicated Deployment manages the MySQL pods, ensuring availability and scalability.
     - Persistent Volumes:
@@ -206,7 +213,7 @@ components and configurations. Also an image shows the components after a succes
 Below is a detailed description of the configurable variables in the `values.yaml` file for the SKAO Staging Service Helm deployment. These variables allow customization of the deployment to suit specific requirements.
 
 Key Configuration Variables
----------------------------
+********
 
 .. list-table::
    :header-rows: 1
@@ -393,8 +400,6 @@ Key Configuration Variables
 This configuration file provides flexibility in defining the deployment specifics for
 the SKAO Staging Service, ensuring compatibility with different Kubernetes environments.
 
-
-
 API Schema
 -----------
 It illustrates the decision-making process, validations, and actions performed at various stages of an API
@@ -409,10 +414,10 @@ for a detailed descriptions of all available functions, their parameters,
 return values, and exceptions.
 
 Building and Testing the SKAO Staging Service
-=============================================
+----------
 
 Build the Service
------------------
+*******
 0. **Create a tunnel (Minikube)**:
    If using Minikube, create a tunnel to expose the service:
 
@@ -456,7 +461,7 @@ Build the Service
     provided by FastAPI, built using Swagger UI.
 
 Testing the Service
--------------------
+******
 1. **Set up local directories**:
     Create two directories on your host machine:
         - One for simulating the local storage.
@@ -489,6 +494,12 @@ Testing the Service
 
         kubectl get pods
         kubectl exec -it skao-staging-service-pod -- ls -la /mnt/storage_b/user_areas/File1Copy.txt
+
+To Do List
+----------
+- [ ] Implement mysql interactions with sqlalchemy
+- [ ] Implement rucio_copy which uses Rucio Rest API to perform data movement between Storages
+- [ ] Implement Copy to Ceph Object Storage with boto3 library
 
 
 .. toctree::
